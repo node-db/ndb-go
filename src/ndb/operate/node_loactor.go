@@ -20,15 +20,6 @@ func Locate(node *common.Node, query string, isCreate bool, action func(node *co
 		subQuery = strings.TrimSpace(query[strings.Index(query, "->") + 2 : len(query)])
 	}
 	
-	if isCreate == true {
-		children := node.FindChildByName(queryKey)
-		if len(children) == 0 {
-			childNode := new(common.Node)
-			childNode.SetName(queryKey)
-			node.AddChild(childNode)
-		}
-	}
-	
 	if subQuery != queryKey || strings.HasPrefix(queryKey, ":") {
 		if strings.HasPrefix(queryKey, ":") {
 			// 路径模糊查询
@@ -77,8 +68,9 @@ func Locate(node *common.Node, query string, isCreate bool, action func(node *co
 			children := node.FindChildByName(queryKey)
 			if isCreate == true {
 				newNode := new(common.Node)
+				newNode.SetName(queryKey)
 				action(newNode)
-				children = append(children, newNode)
+				node.AddChild(newNode)
 			} else {
 				for _, child := range children {
 					action(child)

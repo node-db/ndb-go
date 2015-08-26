@@ -4,7 +4,6 @@ import (
 	"strings"
 )
 
-
 type Node struct {
 	name string
 	values map[string][]string
@@ -51,6 +50,16 @@ func (node *Node) GetChileren() []*Node {
 func (node *Node) GetValue(key string) []string {
 	value := node.values
 	return value[key]
+}
+
+func (node *Node) DeleteValue(key string) {
+	delete(node.values, key)
+}
+
+func (node *Node) ClearValue() {
+	for key, _ := range node.values {
+		delete(node.values, key)
+	}
 }
 
 func (node *Node) GetValueString(key string) string {

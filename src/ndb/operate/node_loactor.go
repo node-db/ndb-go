@@ -140,3 +140,17 @@ func CheckValue(value string, exp string) bool {
 	
 	return false
 }
+
+
+func CovertValueMap(updateValue string) (map[string]string) {
+	valueMap := make(map[string]string)
+	values := strings.Split(updateValue, ",")
+	for _, value := range values {
+		valuePair := strings.Split(value, "=")
+		if len(valuePair) == 2 {
+			valueMap[strings.TrimSpace(valuePair[0])] = strings.TrimSpace(valuePair[1])
+		}
+	}
+	
+	return valueMap
+}

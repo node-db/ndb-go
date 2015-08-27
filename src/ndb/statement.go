@@ -1,49 +1,62 @@
-package main
+package ndb
 
 import (
+	"strings"
 	"ndb/common"
 	"ndb/operate"
-	"fmt"
 )
 
-func execute(node *common.Node, query string) []*common.Node{
-	return nil
-}
-
-func read(filename string) (*common.Node, error) {
-	return common.Read(filename)
-}
-
-func main() {
-	node, err := common.Read("example.ndb")
-	if err == nil {
-		children := operate.Select(node, "root->parent->child->name:lily")
-		if len(children) == 1 {
-			person := children[0]
-			fmt.Println(person.GetValues())
-		}
-		children = operate.Select(node, "root->parent->child->name:m$ && sex:^m")
-		fmt.Println(len(children))
+func Execute(node *common.Node, query string) interface{} {
+	command := query
+	
+	if strings.Contains(query, ":") {
+		command = strings.TrimSpace(query[0 : strings.Index(query, ":")])
+		query = strings.TrimSpace(query[strings.Index(query, ":") + 1 : len(query)])
+	}
+	
+	queryItems := strings.Split(query, "!!")
+	
+	if queryItems != nil && len(queryItems) > 0 {
+		path := strings.TrimSpace(queryItems[0])
 		
-		node = operate.Update(node, "root->parent->child->name:lily", "age=33, phone=13343351822")
-		children = operate.Select(node, "root->parent->child->name:lily")
-		if len(children) == 1 {
-			person := children[0]
-			fmt.Println(person.GetValues())
+		value := ""
+		if len(queryItems) > 1 {
+			value = strings.TrimSpace(queryItems[1])
 		}
 		
-		node = operate.Delete(node, "root->parent->child->name:lily", "[age, phone]")
-		children = operate.Select(node, "root->parent->child->name:lily")
-		if len(children) == 1 {
-			person := children[0]
-			fmt.Println(person.GetValues())
-		}
-		
-		node = operate.Delete(node, "root->parent->child->name:lily", "block")
-		children = operate.Select(node, "root->parent->child->name:lily")
-		if len(children) == 0 {
-			fmt.Println("Not found : Lily")
+		if command != "" {
+			command = strings.ToLower(command)
+			if command == "select" || command == "one" || command == "exist" {
+				result := operate.Select(node, path)
+				
+				if command == "one" {
+					if result != nil && len(result) > 0 {
+						return result[0]
+					} else {
+						return nil
+					}
+				} else if command == "exist"{
+					if  result != nil && len(result) > 0 {
+						return true 
+					} else {
+						return false
+					}
+				}
+				
+				return result
+			} else if command == "update" {
+				return operate.Update(node, path, value)
+			} else if command == "delete" {
+				return operate.Delete(node, path, value)
+			} else if command == "insert" {
+				return operate.Insert(node, path, value)
+			}
 		}
 	}
+    
+    return nil
+}
 
+func Read(filename string) (*common.Node, error) {
+	return common.Read(filename)
 }

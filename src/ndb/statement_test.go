@@ -1,8 +1,8 @@
 package ndb
 
 import (
-    "testing"
-    "ndb/common"
+	"testing"
+	"ndb/common"
 )
 
 

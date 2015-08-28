@@ -1,7 +1,7 @@
 package common
 
 import (
-    "testing"
+	"testing"
 )
 
 func TestRead(t *testing.T) {

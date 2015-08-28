@@ -144,23 +144,24 @@ item : value用于检索对应的node，根据后面的值对节点中的数据�
 	package main
 	
 	import (
-		"fmt"
+		"ndb"
 		"ndb/common"
-		"ndb/operate"
+		"fmt"
 	)
 	
 	func main() {
-		node, err := common.Read("example.ndb")
+		node, err := ndb.Read("example.ndb")
 		if err == nil {
-			children := operate.Select(node, "root->parent->child->name:lily")
-			if len(children) == 1 {
-				person := children[0]
-				fmt.Println(person.GetValues())
+			query := "select:root->parent->child->name:/.*m/"
+			result, found := ndb.Execute(node, query)
+			if found {
+				children, ok := result.([]*common.Node)
+				if ok {
+					for _, child := range children {
+						fmt.Println(child.GetValues())
+					}
+				}
 			}
-			children = operate.Select(node, "root->parent->child->name:m$ && sex:^m")
-			fmt.Println(len(children))
 		}
-	
 	}
-
 

@@ -101,8 +101,8 @@ func CheckValue(value string, exp string) bool {
 		numbers := strings.Split(exp, ",")
 		if numbers != nil && len(numbers) == 2 {
 			val, valErr := strconv.Atoi(value)
-			max, maxErr := strconv.Atoi(numbers[0])
-			min, minErr := strconv.Atoi(numbers[1])
+			min, maxErr := strconv.Atoi(numbers[0])
+			max, minErr := strconv.Atoi(numbers[1])
 			if valErr != nil || maxErr != nil || minErr != nil {
 				return false
 			}

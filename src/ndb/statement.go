@@ -6,7 +6,7 @@ import (
 	"ndb/operate"
 )
 
-func Execute(node *common.Node, query string) interface{} {
+func Execute(node *common.Node, query string) (interface{}, bool) {
 	command := query
 	
 	if strings.Contains(query, ":") {
@@ -27,34 +27,38 @@ func Execute(node *common.Node, query string) interface{} {
 		if command != "" {
 			command = strings.ToLower(command)
 			if command == "select" || command == "one" || command == "exist" {
-				result := operate.Select(node, path)
+				result, found := operate.Select(node, path)
 				
 				if command == "one" {
-					if result != nil && len(result) > 0 {
-						return result[0]
+					if found {
+						return result[0], true
 					} else {
-						return nil
+						return nil, false
 					}
 				} else if command == "exist"{
-					if  result != nil && len(result) > 0 {
-						return true 
+					if  found {
+						return nil, true 
 					} else {
-						return false
+						return nil, false
 					}
 				}
 				
-				return result
+				return result, found
 			} else if command == "update" {
 				return operate.Update(node, path, value)
 			} else if command == "delete" {
 				return operate.Delete(node, path, value)
 			} else if command == "insert" {
 				return operate.Insert(node, path, value)
+			} else {
+				panic("unknow operate : " + command) 
 			}
 		}
+	} else {
+		panic("unknow query : " + query) 
 	}
     
-    return nil
+    return nil, false
 }
 
 func Read(filename string) (*common.Node, error) {

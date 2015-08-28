@@ -5,10 +5,12 @@ import (
 	"ndb/common"
 )
 
-func Delete(node *common.Node, path string, deleteValue string) *common.Node {
+func Delete(node *common.Node, path string, deleteValue string) (*common.Node, bool) {
 	
 	columns := []string{}
 	clear := false
+	
+	found := false
 	
 	if deleteValue != "" {
 		if strings.HasPrefix(deleteValue, "[") && strings.HasSuffix(deleteValue, "]") {
@@ -26,9 +28,11 @@ func Delete(node *common.Node, path string, deleteValue string) *common.Node {
 				node.DeleteValue(strings.TrimSpace(column))
 			}
 		}
+		
+		found = true
 	})
 	
-	return node
+	return node, found
 }
 
 

@@ -24,5 +24,4 @@ _testmain.go
 *.prof
 /bin/
 /.project
-/pkg/
 /.settings/

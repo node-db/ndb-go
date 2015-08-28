@@ -164,4 +164,14 @@ item : value用于检索对应的node，根据后面的值对节点中的数据�
 			}
 		}
 	}
+	
+## 命令行中使用ndb ##
 
+查询ndb中节点信息
+
+	ndb_cli -f example.ndb -q select:root->parent->child->name:/.*m/
+	
+输出help信息
+	
+	ndb_cli -h
+	

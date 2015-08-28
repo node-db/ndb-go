@@ -1,0 +1,25 @@
+root {
+	parent {
+		name : green
+	    child {
+	    		name: jim
+	    		age: 20
+	    		sex: male
+	    		} 
+	    child {
+	    		name: lily
+	    		age: 17
+	    		sex: female
+	    		}
+	    child {
+	    		name: tom
+	    		age: 28
+	    		sex: male
+	    }
+		nephew {
+			name: lucy
+			age: 12
+			sex: female
+		}
+	}	
+}

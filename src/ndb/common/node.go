@@ -43,6 +43,12 @@ func (node *Node) AddChild(child *Node) {
 	node.children = append(node.children, child)
 }
 
+func (node *Node) AddChildren(children []*Node) {
+	for _, child := range children {
+		node.AddChild(child)
+	}
+}
+
 func (node *Node) GetChileren() []*Node {
 	return node.children
 }

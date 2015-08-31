@@ -7,37 +7,27 @@ import (
 
 
 func LoadTestData() *common.Node{
-	child1 := new(common.Node)
-	child1.SetName("child")
-	child1.SetValue("name", []string{"jim"})
-	child1.SetValue("age", []string{"20"})
-	child1.SetValue("sex", []string{"male"})
 	
-	child2 := new(common.Node)
-	child2.SetName("child")
-	child2.SetValue("name", []string{"lily"})
-	child2.SetValue("age", []string{"17"})
-	child2.SetValue("sex", []string{"female"})
+	NewChild := func (node string, name string, age string, sex string) *common.Node {
+		child := new(common.Node)
+		
+		child.SetName(node)
+		child.SetValue("name", []string{name})
+		child.SetValue("age", []string{age})
+		child.SetValue("sex", []string{sex})
+		
+		return child
+	}
 	
-	child3 := new(common.Node)
-	child3.SetName("child")
-	child3.SetValue("name", []string{"tom"})
-	child3.SetValue("age", []string{"28"})
-	child3.SetValue("sex", []string{"male"})
-	
-	child4 := new(common.Node)
-	child4.SetName("nephew")
-	child4.SetValue("name", []string{"lucy"})
-	child4.SetValue("age", []string{"12"})
-	child4.SetValue("sex", []string{"female"})
+	child1 := NewChild("child", "jim", "20", "male")
+	child2 := NewChild("child", "lily", "17", "female")
+	child3 := NewChild("child", "tom", "28", "male")
+	child4 := NewChild("nephew", "lucy", "12", "female")
 	
 	parent := new(common.Node)
 	parent.SetName("parent")
 	parent.SetValue("name", []string{"green"})
-	parent.AddChild(child1)
-	parent.AddChild(child2)
-	parent.AddChild(child3)
-	parent.AddChild(child4)
+	parent.AddChildren([]*common.Node{child1, child2, child3, child4})
 	
 	root := new(common.Node)
 	root.SetName("root")
@@ -93,114 +83,44 @@ func TestSelect(t *testing.T) {
 	
 	if node != nil {
 		
-		query := "select:root->parent->child->name:/.*m/"
-		result, found := Execute(node, query)
-		if found {
-			children, ok := result.([]*common.Node)
-        	if ok && len(children) == 2{
-        		if children[0].GetValueString("name") != "jim" || 
-        			children[1].GetValueString("name") != "tom" {
-        			t.Fatalf("select test fail : %s", query)
-        		}
-        	}
-		} else {
-			t.Fatalf("select test fail : %s", query)
+		SelectAssert := func (query string, expect []string) {
+			result, found := Execute(node, query)
+			if found {
+				children, ok := result.([]*common.Node)
+	        	if ok && len(children) == len(expect) {
+	        		for i := 0 ; i < len(expect) ; i++ {
+	        			child := children[i]
+	        			if child.GetValueString("name") != expect[i] {
+	        				t.Fatalf("select test fail : %s", query)
+	        				break
+	        			}
+	        		}
+	        	}
+			} else {
+				t.Fatalf("select test fail : %s", query)
+			}
 		}
+		
+		query := "select:root->parent->child->name:/.*m/"
+		SelectAssert(query, []string{"jim", "tom"})
 		
 		query = "select:root->parent->child->age:[15,25]"
-		result, found = Execute(node, query)
-		if found {
-			children, ok := result.([]*common.Node)
-        	if ok && len(children) == 2 {
-        		if children[0].GetValueString("name") != "jim" || 
-        			children[1].GetValueString("name") != "lily" {
-        			t.Fatalf("select test fail : %s", query)
-        		}
-        	} else {
-        		t.Fatalf("select test fail : %s", query)
-        	}
-		} else {
-			t.Fatalf("select test fail : %s", query)
-		}
+		SelectAssert(query, []string{"jim", "lily"})
 		
 		query = "select:root->parent->child->sex:^fe"
-		result, found = Execute(node, query)
-		if found {
-			children, ok := result.([]*common.Node)
-        	if ok && len(children) == 1 {
-        		if children[0].GetValueString("name") != "lily" {
-        			t.Fatalf("select test fail : %s", query)
-        		}
-        	} else {
-        		t.Fatalf("select test fail : %s", query)
-        	}
-		} else {
-			t.Fatalf("select test fail : %s", query)
-		}
+		SelectAssert(query, []string{"lily"})
 		
 		query = "select:root->parent->child->name:m$"
-		result, found = Execute(node, query)
-		if found {
-			children, ok := result.([]*common.Node)
-        	if ok && len(children) == 2 {
-        		if children[0].GetValueString("name") != "jim" || 
-        			children[1].GetValueString("name") != "tom" {
-        			t.Fatalf("select test fail : %s", query)
-        		}
-        	} else {
-        		t.Fatalf("select test fail : %s", query)
-        	}
-		} else {
-			t.Fatalf("select test fail : %s", query)
-		}
-		
+		SelectAssert(query, []string{"jim", "tom"})
+
 		query = "select:root->parent->child->sex:male && age:[15,25]"
-		result, found = Execute(node, query)
-		if found {
-			children, ok := result.([]*common.Node)
-        	if ok && len(children) == 1 {
-        		if children[0].GetValueString("name") != "jim" {
-        			t.Fatalf("select test fail : %s", query)
-        		}
-        	} else {
-        		t.Fatalf("select test fail : %s", query)
-        	}
-		} else {
-			t.Fatalf("select test fail : %s", query)
-		}
+		SelectAssert(query, []string{"jim"})
 		
 		query = "select:root->parent->child"
-		result, found = Execute(node, query)
-		if found {
-			children, ok := result.([]*common.Node)
-        	if ok && len(children) == 3 {
-        		if children[0].GetValueString("name") != "jim" ||
-        			children[1].GetValueString("name") != "lily" ||
-        			children[2].GetValueString("name") != "tom" {
-        			t.Fatalf("select test fail : %s", query)
-        		}
-        	} else {
-        		t.Fatalf("select test fail : %s", query)
-        	}
-		} else {
-			t.Fatalf("select test fail : %s", query)
-		}
-		
+		SelectAssert(query, []string{"jim", "lily", "tom"})
+
 		query = "select:root->parent->:/child|nephew/->sex:female"
-		result, found = Execute(node, query)
-		if found {
-			children, ok := result.([]*common.Node)
-        	if ok && len(children) == 2 {
-        		if children[0].GetValueString("name") != "lily" || 
-        			children[1].GetValueString("name") != "lucy" {
-        			t.Fatalf("select test fail : %s", query)
-        		}
-        	} else {
-        		t.Fatalf("select test fail : %s", query)
-        	}
-		} else {
-			t.Fatalf("select test fail : %s", query)
-		}
+		SelectAssert(query, []string{"lily", "lucy"})
 	}
 }
 

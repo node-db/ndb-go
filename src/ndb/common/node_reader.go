@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"ndb/data"
 )
 
 func GetCurrPath() string {
@@ -20,7 +21,7 @@ func GetCurrPath() string {
 	return currPath
 }
 
-func Read(filename string) (*Node, error) {
+func Read(filename string) (*data.Node, error) {
 	if filename == "" {
 		return nil, errors.New("Filename is NULL")
 	}
@@ -60,9 +61,9 @@ func ReadFile(filename string) ([]string, error) {
 	return result, nil
 }
 
-func Parse(linenum int, contents []string, parent *Node) (*Node, int) {
+func Parse(linenum int, contents []string, parent *data.Node) (*data.Node, int) {
 	if parent == nil {
-		parent = new(Node)
+		parent = new(data.Node)
 	}
 
 	if contents != nil {
@@ -72,8 +73,8 @@ func Parse(linenum int, contents []string, parent *Node) (*Node, int) {
 				continue
 			}
 			if strings.HasSuffix(line, "{") {
-				node := new(Node)
-				node.name = strings.TrimSpace(line[:strings.LastIndex(line, "{")])
+				node := new(data.Node)
+				node.SetName(strings.TrimSpace(line[:strings.LastIndex(line, "{")]))
 				nodeChild, _line := Parse(i+1, contents, node)
 				parent.AddChild(nodeChild)
 

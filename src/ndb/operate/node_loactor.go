@@ -1,13 +1,13 @@
 package operate
 
 import (
-	"ndb/common"
+	"ndb/data"
 	"strings"
 	"strconv"
 	"regexp"
 )
 
-func Locate(node *common.Node, query string, isCreate bool, action func(node *common.Node)) {
+func Locate(node *data.Node, query string, isCreate bool, action func(node *data.Node)) {
 	if query == "" || node == nil {
 		return
 	}
@@ -67,7 +67,7 @@ func Locate(node *common.Node, query string, isCreate bool, action func(node *co
 		} else {
 			children := node.FindChildByName(queryKey)
 			if isCreate == true {
-				newNode := new(common.Node)
+				newNode := new(data.Node)
 				newNode.SetName(queryKey)
 				action(newNode)
 				node.AddChild(newNode)

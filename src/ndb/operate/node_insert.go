@@ -1,15 +1,15 @@
 package operate
 
 import (
-	"ndb/common"
+	"ndb/data"
 )
 
-func Insert(node *common.Node, path string, insertValue string) (*common.Node, bool) {
+func Insert(node *data.Node, path string, insertValue string) (*data.Node, bool) {
 	
 	insertValueMap := CovertValueMap(insertValue)
 	found := false
 	
-	Locate(node, path, true, func (node *common.Node) {
+	Locate(node, path, true, func (node *data.Node) {
 		for key, value := range insertValueMap {
 			node.SetValue(key, []string{value})
 		}

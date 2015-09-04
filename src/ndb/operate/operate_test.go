@@ -2,13 +2,13 @@ package operate
 
 import (
 	"testing"
-	"ndb/common"
+	"ndb/data"
 )
 
-func LoadTestData() *common.Node {
+func LoadTestData() *data.Node {
 	
-	NewChild := func (node string, name string, age string, sex string) *common.Node {
-		child := new(common.Node)
+	NewChild := func (node string, name string, age string, sex string) *data.Node {
+		child := new(data.Node)
 		
 		child.SetName(node)
 		child.SetValue("name", []string{name})
@@ -23,16 +23,16 @@ func LoadTestData() *common.Node {
 	child3 := NewChild("child", "tom", "28", "male")
 	child4 := NewChild("nephew", "lucy", "12", "female")
 	
-	parent := new(common.Node)
+	parent := new(data.Node)
 	parent.SetName("parent")
 	parent.SetValue("name", []string{"green"})
-	parent.AddChildren([]*common.Node{child1, child2, child3, child4})
+	parent.AddChildren([]*data.Node{child1, child2, child3, child4})
 	
-	root := new(common.Node)
+	root := new(data.Node)
 	root.SetName("root")
 	root.AddChild(parent)
 	
-	node := new(common.Node)
+	node := new(data.Node)
 	node.AddChild(root)
 	
 	return node

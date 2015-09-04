@@ -2,10 +2,10 @@ package operate
 
 import (
 	"strings"
-	"ndb/common"
+	"ndb/data"
 )
 
-func Delete(node *common.Node, path string, deleteValue string) (*common.Node, bool) {
+func Delete(node *data.Node, path string, deleteValue string) (*data.Node, bool) {
 	
 	columns := []string{}
 	clear := false
@@ -20,7 +20,7 @@ func Delete(node *common.Node, path string, deleteValue string) (*common.Node, b
 		}
 	}
 	
-	Locate(node, path, false, func (node *common.Node) {
+	Locate(node, path, false, func (node *data.Node) {
 		if clear {
 			node.ClearValue()
 		} else {

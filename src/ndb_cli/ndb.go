@@ -2,7 +2,7 @@ package main
 
 import (
 	"ndb"
-	"ndb/common"
+	"ndb/data"
 	"flag"
 	"fmt"
 	"strings"
@@ -27,13 +27,13 @@ func main() {
 			result, found := ndb.Execute(node, *query)
 			if found {
 				switch result.(type) { 
-				case []*common.Node:
-					list := result.([]*common.Node)
+				case []*data.Node:
+					list := result.([]*data.Node)
 					for _, item := range list {
 						PrintNode(item)
 					}
-				case *common.Node:
-					PrintNode(result.(*common.Node))
+				case *data.Node:
+					PrintNode(result.(*data.Node))
 				}
 			} else {
 				fmt.Printf("%s Found NOTHING\n", *query)	
@@ -46,7 +46,7 @@ func main() {
 	}
 }
 
-func PrintNode(node *common.Node) {
+func PrintNode(node *data.Node) {
 	tab := "|--"
 	
 	fmt.Println(node.GetName())

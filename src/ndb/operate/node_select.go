@@ -1,15 +1,15 @@
 package operate
 
 import (
-	"ndb/common"
+	"ndb/data"
 )
 
-func Select(node *common.Node, path string) ([]*common.Node, bool) {
+func Select(node *data.Node, path string) ([]*data.Node, bool) {
 	
-	result := []*common.Node{}
+	result := []*data.Node{}
 	found := false
 	
-	Locate(node, path, false, func (node *common.Node) {
+	Locate(node, path, false, func (node *data.Node) {
 		result = append(result, node)
 		found = true
 	})

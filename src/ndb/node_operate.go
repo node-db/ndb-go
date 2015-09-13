@@ -1,13 +1,12 @@
-package operate
+package ndb
 
 import (
-	"ndb/data"
 	"strings"
 	"strconv"
 	"regexp"
 )
 
-func Locate(node *data.Node, query string, isCreate bool, action func(node *data.Node)) {
+func Locate(node *Node, query string, isCreate bool, action func(node *Node)) {
 	if query == "" || node == nil {
 		return
 	}
@@ -67,7 +66,7 @@ func Locate(node *data.Node, query string, isCreate bool, action func(node *data
 		} else {
 			children := node.FindChildByName(queryKey)
 			if isCreate == true {
-				newNode := new(data.Node)
+				newNode := new(Node)
 				newNode.SetName(queryKey)
 				action(newNode)
 				node.AddChild(newNode)
@@ -145,4 +144,77 @@ func CovertValueMap(updateValue string) (map[string]string) {
 	}
 	
 	return valueMap
+}
+
+func Delete(node *Node, path string, deleteValue string) (*Node, bool) {
+	
+	columns := []string{}
+	clear := false
+	
+	found := false
+	
+	if deleteValue != "" {
+		if strings.HasPrefix(deleteValue, "[") && strings.HasSuffix(deleteValue, "]") {
+			columns = strings.Split(deleteValue[1:len(deleteValue)-1], ",")
+		} else if deleteValue == "block" {
+			clear = true
+		}
+	}
+	
+	Locate(node, path, false, func (node *Node) {
+		if clear {
+			node.ClearValue()
+		} else {
+			for _, column := range columns {
+				node.DeleteValue(strings.TrimSpace(column))
+			}
+		}
+		
+		found = true
+	})
+	
+	return node, found
+}
+
+func Insert(node *Node, path string, insertValue string) (*Node, bool) {
+	
+	insertValueMap := CovertValueMap(insertValue)
+	found := false
+	
+	Locate(node, path, true, func (node *Node) {
+		for key, value := range insertValueMap {
+			node.SetValue(key, []string{value})
+		}
+		found = true
+	})
+	
+	return node, found
+}
+
+func Select(node *Node, path string) ([]*Node, bool) {
+	
+	result := []*Node{}
+	found := false
+	
+	Locate(node, path, false, func (node *Node) {
+		result = append(result, node)
+		found = true
+	})
+	
+	return result, found
+}
+
+func Update(node *Node, path string, updateValue string) (*Node, bool) {
+	
+	updateValueMap := CovertValueMap(updateValue)
+	found := false
+	
+	Locate(node, path, false, func (node *Node) {
+		for key, value := range updateValueMap {
+			node.SetValue(key, []string{value})
+		}
+		found = true
+	})
+	
+	return node, found
 }

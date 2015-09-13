@@ -1,44 +1,10 @@
-package operate
+package ndb
 
 import (
 	"testing"
-	"ndb/data"
 )
 
-func LoadTestData() *data.Node {
-	
-	NewChild := func (node string, name string, age string, sex string) *data.Node {
-		child := new(data.Node)
-		
-		child.SetName(node)
-		child.SetValue("name", []string{name})
-		child.SetValue("age", []string{age})
-		child.SetValue("sex", []string{sex})
-		
-		return child
-	}
-	
-	child1 := NewChild("child", "jim", "20", "male")
-	child2 := NewChild("child", "lily", "17", "female")
-	child3 := NewChild("child", "tom", "28", "male")
-	child4 := NewChild("nephew", "lucy", "12", "female")
-	
-	parent := new(data.Node)
-	parent.SetName("parent")
-	parent.SetValue("name", []string{"green"})
-	parent.AddChildren([]*data.Node{child1, child2, child3, child4})
-	
-	root := new(data.Node)
-	root.SetName("root")
-	root.AddChild(parent)
-	
-	node := new(data.Node)
-	node.AddChild(root)
-	
-	return node
-}
-
-func TestSelect(t *testing.T) {
+func TestOperateSelect(t *testing.T) {
 	node := LoadTestData()
 	
 	if node != nil {
@@ -62,7 +28,7 @@ func TestSelect(t *testing.T) {
 	}
 }
 
-func TestDelete(t *testing.T) {
+func TestOperateDelete(t *testing.T) {
 	node := LoadTestData()
 	
 	if node != nil {
@@ -89,7 +55,7 @@ func TestDelete(t *testing.T) {
 	}
 }
 
-func TestUpdate(t *testing.T) {
+func TestOperateUpdate(t *testing.T) {
 	node := LoadTestData()
 	
 	if node != nil {
@@ -108,7 +74,7 @@ func TestUpdate(t *testing.T) {
 	}
 }
 
-func TestInsert(t *testing.T) {
+func TestOperateInsert(t *testing.T) {
 	node := LoadTestData()
 	
 	if node != nil {

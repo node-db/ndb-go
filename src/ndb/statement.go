@@ -1,13 +1,10 @@
 package ndb
 
 import (
-	"ndb/data"
-	"ndb/common"
-	"ndb/operate"
 	"strings"
 )
 
-func Execute(node *data.Node, query string) (interface{}, bool) {
+func Execute(node *Node, query string) (interface{}, bool) {
 	command := query
 
 	if strings.Contains(query, ":") {
@@ -28,7 +25,7 @@ func Execute(node *data.Node, query string) (interface{}, bool) {
 		if command != "" {
 			command = strings.ToLower(command)
 			if command == "select" || command == "one" || command == "exist" {
-				result, found := operate.Select(node, path)
+				result, found := Select(node, path)
 
 				if command == "one" {
 					if found {
@@ -46,11 +43,11 @@ func Execute(node *data.Node, query string) (interface{}, bool) {
 
 				return result, found
 			} else if command == "update" {
-				return operate.Update(node, path, value)
+				return Update(node, path, value)
 			} else if command == "delete" {
-				return operate.Delete(node, path, value)
+				return Delete(node, path, value)
 			} else if command == "insert" {
-				return operate.Insert(node, path, value)
+				return Insert(node, path, value)
 			} else {
 				panic("unknow operate : " + command)
 			}
@@ -60,8 +57,4 @@ func Execute(node *data.Node, query string) (interface{}, bool) {
 	}
 
 	return nil, false
-}
-
-func Read(filename string) (*data.Node, error) {
-	return common.Read(filename)
 }

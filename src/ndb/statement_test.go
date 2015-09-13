@@ -1,14 +1,13 @@
 package ndb
 
 import (
-	"ndb/data"
 	"testing"
 )
 
-func LoadTestData() *data.Node {
+func LoadTestData() *Node {
 
-	NewChild := func(node string, name string, age string, sex string) *data.Node {
-		child := new(data.Node)
+	NewChild := func(node string, name string, age string, sex string) *Node {
+		child := new(Node)
 
 		child.SetName(node)
 		child.SetValue("name", []string{name})
@@ -23,16 +22,16 @@ func LoadTestData() *data.Node {
 	child3 := NewChild("child", "tom", "28", "male")
 	child4 := NewChild("nephew", "lucy", "12", "female")
 
-	parent := new(data.Node)
+	parent := new(Node)
 	parent.SetName("parent")
 	parent.SetValue("name", []string{"green"})
-	parent.AddChildren([]*data.Node{child1, child2, child3, child4})
+	parent.AddChildren([]*Node{child1, child2, child3, child4})
 
-	root := new(data.Node)
+	root := new(Node)
 	root.SetName("root")
 	root.AddChild(parent)
 
-	node := new(data.Node)
+	node := new(Node)
 	node.AddChild(root)
 
 	return node
@@ -68,7 +67,7 @@ func TestOne(t *testing.T) {
 	if node != nil {
 		query := "one:root->parent->child->sex:male"
 		result, _ := Execute(node, query)
-		child, ok := result.(*data.Node)
+		child, ok := result.(*Node)
 		if ok {
 			if child.GetValueString("name") != "jim" || child.GetValueString("age") != "20" {
 				t.Fatalf("one test fail : %s", query)
@@ -85,7 +84,7 @@ func TestSelect(t *testing.T) {
 		SelectAssert := func(query string, expect []string) {
 			result, found := Execute(node, query)
 			if found {
-				children, ok := result.([]*data.Node)
+				children, ok := result.([]*Node)
 				if ok && len(children) == len(expect) {
 					for i := 0; i < len(expect); i++ {
 						child := children[i]
@@ -130,8 +129,8 @@ func TestUpdate(t *testing.T) {
 		query := "update:root->parent->child->name:jim !! age=21, address=China"
 		result, found := Execute(node, query)
 		if found {
-			updateResult, _ := Execute(result.(*data.Node), "one:root->parent->child->name:jim")
-			child, ok := updateResult.(*data.Node)
+			updateResult, _ := Execute(result.(*Node), "one:root->parent->child->name:jim")
+			child, ok := updateResult.(*Node)
 			if ok {
 				if child.GetValueString("age") != "21" ||
 					child.GetValueString("address") != "China" {
@@ -153,8 +152,8 @@ func TestDelete(t *testing.T) {
 		query := "delete:root->parent->child->name:jim !! [sex, age]"
 		result, found := Execute(node, query)
 		if found {
-			deleteResult, _ := Execute(result.(*data.Node), "one:root->parent->child->name:jim")
-			child, ok := deleteResult.(*data.Node)
+			deleteResult, _ := Execute(result.(*Node), "one:root->parent->child->name:jim")
+			child, ok := deleteResult.(*Node)
 			if ok {
 				if child.GetValueString("name") != "jim" ||
 					child.GetValueString("sex") != "" ||
@@ -171,8 +170,8 @@ func TestDelete(t *testing.T) {
 		query = "delete:root->parent->child->name:jim !! block"
 		result, found = Execute(node, query)
 		if found {
-			deleteResult, _ := Execute(result.(*data.Node), "select:root->parent->child->name:jim")
-			children, _ := deleteResult.([]*data.Node)
+			deleteResult, _ := Execute(result.(*Node), "select:root->parent->child->name:jim")
+			children, _ := deleteResult.([]*Node)
 			if len(children) > 0 {
 				t.Fatalf("delete test fail : %s", query)
 			}
@@ -189,8 +188,8 @@ func TestInsert(t *testing.T) {
 		query := "insert:root->parent->child !! name=bill, sex=male, age=31"
 		result, _ := Execute(node, query)
 
-		insertResult, _ := Execute(result.(*data.Node), "one:root->parent->child->name:bill")
-		child, ok := insertResult.(*data.Node)
+		insertResult, _ := Execute(result.(*Node), "one:root->parent->child->name:bill")
+		child, ok := insertResult.(*Node)
 		if ok {
 			if child.GetValueString("name") != "bill" ||
 				child.GetValueString("sex") != "male" ||

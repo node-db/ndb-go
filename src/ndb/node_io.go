@@ -20,47 +20,43 @@ func GetCurrPath() string {
 	return currPath
 }
 
-func Read(filename string) (*Node, error) {
+func ReadFile(filename string) (*Node, error) {
 	if filename == "" {
 		return nil, errors.New("Filename is NULL")
 	}
 	if !strings.Contains(filename, "\\") && !strings.Contains(filename, "/") {
 		filename = GetCurrPath() + "/" + filename
 	}
-	content, err := ReadFile(filename)
+	
+	fin, err := os.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+	defer fin.Close()
+	bfRd := bufio.NewReader(fin)
+	
+	content := []string{}
+	
+	for {
+		line, err := bfRd.ReadBytes('\n')
+		content = append(content, string(line))
+
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+		}
+	}
+	
 	if err == nil {
-		node, _ := Parse(0, content, nil)
+		node, _ := ParseStringToNode(0, content, nil)
 		return node, nil
 	} else {
 		return nil, err
 	}
 }
 
-func ReadFile(filename string) ([]string, error) {
-	fi, err := os.Open(filename)
-	if err != nil {
-		panic(err)
-	}
-	defer fi.Close()
-
-	result := []string{}
-
-	bfRd := bufio.NewReader(fi)
-	for {
-		line, err := bfRd.ReadBytes('\n')
-		result = append(result, string(line))
-
-		if err != nil {
-			if err == io.EOF {
-				return result, nil
-			}
-			return result, err
-		}
-	}
-	return result, nil
-}
-
-func Parse(linenum int, contents []string, parent *Node) (*Node, int) {
+func ParseStringToNode(linenum int, contents []string, parent *Node) (*Node, int) {
 	if parent == nil {
 		parent = new(Node)
 	}
@@ -74,7 +70,7 @@ func Parse(linenum int, contents []string, parent *Node) (*Node, int) {
 			if strings.HasSuffix(line, "{") {
 				node := new(Node)
 				node.SetName(strings.TrimSpace(line[:strings.LastIndex(line, "{")]))
-				nodeChild, _line := Parse(i+1, contents, node)
+				nodeChild, _line := ParseStringToNode(i+1, contents, node)
 				parent.AddChild(nodeChild)
 
 				i = _line
@@ -97,4 +93,49 @@ func Parse(linenum int, contents []string, parent *Node) (*Node, int) {
 	}
 
 	return parent, len(contents)
+}
+
+func WriteFile(filename string, node *Node) error {
+	if filename == "" {
+		return errors.New("Filename is NULL")
+	}
+	
+	fout, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
+	defer fout.Close()
+	
+	nodeStr := ParseNodeToString(node)
+	fout.WriteString(nodeStr)
+	
+	return nil
+}
+
+func ParseNodeToString(node *Node) string {
+	name := node.GetName()
+	values := node.GetValues()
+	children := node.GetChileren()
+	
+	nodeStr := ""
+	if name != "" {
+		nodeStr = name + "{\n"
+	}
+	
+	for key, value := range values {
+		for _, valueItem := range value {
+			nodeStr = nodeStr + key + ":" + valueItem + "\n"
+		}
+		
+	}
+	
+	for _, child := range children {
+		nodeStr = nodeStr + ParseNodeToString(child)
+	}
+	
+	if name != "" {
+		nodeStr = nodeStr + "}\n"
+	}
+	
+	return nodeStr
 }

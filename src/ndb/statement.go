@@ -2,9 +2,15 @@ package ndb
 
 import (
 	"strings"
+	"errors"
 )
 
-func Execute(node *Node, query string) (interface{}, bool) {
+func Execute(node *Node, query string) (interface{}, bool, error) {
+	
+	if node == nil {
+		return nil, false, errors.New("Node is NULL")
+	}
+	
 	command := query
 
 	if strings.Contains(query, ":") {
@@ -25,23 +31,23 @@ func Execute(node *Node, query string) (interface{}, bool) {
 		if command != "" {
 			command = strings.ToLower(command)
 			if command == "select" || command == "one" || command == "exist" {
-				result, found := Select(node, path)
+				result, found, err := Select(node, path)
 
 				if command == "one" {
 					if found {
-						return result[0], true
+						return result[0], true, err
 					} else {
-						return nil, false
+						return nil, false, err
 					}
 				} else if command == "exist" {
 					if found {
-						return nil, true
+						return nil, true, err
 					} else {
-						return nil, false
+						return nil, false, err
 					}
 				}
 
-				return result, found
+				return result, found, err
 			} else if command == "update" {
 				return Update(node, path, value)
 			} else if command == "delete" {
@@ -49,12 +55,12 @@ func Execute(node *Node, query string) (interface{}, bool) {
 			} else if command == "insert" {
 				return Insert(node, path, value)
 			} else {
-				panic("unknow operate : " + command)
+				return nil, false, errors.New("unknow operate : " + command)
 			}
 		}
 	} else {
-		panic("unknow query : " + query)
+		return nil, false, errors.New("unknow query : " + query)
 	}
 
-	return nil, false
+	return nil, false, nil
 }

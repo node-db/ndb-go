@@ -146,7 +146,7 @@ func CovertValueMap(updateValue string) (map[string]string) {
 	return valueMap
 }
 
-func Delete(node *Node, path string, deleteValue string) (*Node, bool) {
+func Delete(node *Node, path string, deleteValue string) (*Node, bool, error) {
 	
 	columns := []string{}
 	clear := false
@@ -173,10 +173,10 @@ func Delete(node *Node, path string, deleteValue string) (*Node, bool) {
 		found = true
 	})
 	
-	return node, found
+	return node, found, nil
 }
 
-func Insert(node *Node, path string, insertValue string) (*Node, bool) {
+func Insert(node *Node, path string, insertValue string) (*Node, bool, error) {
 	
 	insertValueMap := CovertValueMap(insertValue)
 	found := false
@@ -188,10 +188,10 @@ func Insert(node *Node, path string, insertValue string) (*Node, bool) {
 		found = true
 	})
 	
-	return node, found
+	return node, found, nil
 }
 
-func Select(node *Node, path string) ([]*Node, bool) {
+func Select(node *Node, path string) ([]*Node, bool, error) {
 	
 	result := []*Node{}
 	found := false
@@ -201,10 +201,10 @@ func Select(node *Node, path string) ([]*Node, bool) {
 		found = true
 	})
 	
-	return result, found
+	return result, found, nil
 }
 
-func Update(node *Node, path string, updateValue string) (*Node, bool) {
+func Update(node *Node, path string, updateValue string) (*Node, bool, error) {
 	
 	updateValueMap := CovertValueMap(updateValue)
 	found := false
@@ -216,5 +216,5 @@ func Update(node *Node, path string, updateValue string) (*Node, bool) {
 		found = true
 	})
 	
-	return node, found
+	return node, found, nil
 }

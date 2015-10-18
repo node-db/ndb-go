@@ -42,19 +42,19 @@ func TestExits(t *testing.T) {
 
 	if node != nil {
 		query := "exist:root->parent->child->name:jim"
-		result, found := Execute(node, query)
+		result, found, _ := Execute(node, query)
 		if result != nil && found == false {
 			t.Fatalf("exits test fail : %s", query)
 		}
 
 		query = "exist:root->parent->child->sex:male && name:m$"
-		result, found = Execute(node, query)
+		result, found, _ = Execute(node, query)
 		if found == false {
 			t.Fatalf("exits test fail : %s", query)
 		}
 
 		query = "exist:root->parent->child->sex:female && name:m$"
-		result, found = Execute(node, query)
+		result, found, _ = Execute(node, query)
 		if found == true {
 			t.Fatalf("exits test fail : %s", query)
 		}
@@ -66,7 +66,7 @@ func TestOne(t *testing.T) {
 
 	if node != nil {
 		query := "one:root->parent->child->sex:male"
-		result, _ := Execute(node, query)
+		result, _, _ := Execute(node, query)
 		child, ok := result.(*Node)
 		if ok {
 			if child.GetValueString("name") != "jim" || child.GetValueString("age") != "20" {
@@ -82,7 +82,7 @@ func TestSelect(t *testing.T) {
 	if node != nil {
 
 		SelectAssert := func(query string, expect []string) {
-			result, found := Execute(node, query)
+			result, found, _ := Execute(node, query)
 			if found {
 				children, ok := result.([]*Node)
 				if ok && len(children) == len(expect) {
@@ -127,9 +127,9 @@ func TestUpdate(t *testing.T) {
 
 	if node != nil {
 		query := "update:root->parent->child->name:jim !! age=21, address=China"
-		result, found := Execute(node, query)
+		result, found, _ := Execute(node, query)
 		if found {
-			updateResult, _ := Execute(result.(*Node), "one:root->parent->child->name:jim")
+			updateResult, _, _ := Execute(result.(*Node), "one:root->parent->child->name:jim")
 			child, ok := updateResult.(*Node)
 			if ok {
 				if child.GetValueString("age") != "21" ||
@@ -150,9 +150,9 @@ func TestDelete(t *testing.T) {
 
 	if node != nil {
 		query := "delete:root->parent->child->name:jim !! [sex, age]"
-		result, found := Execute(node, query)
+		result, found, _ := Execute(node, query)
 		if found {
-			deleteResult, _ := Execute(result.(*Node), "one:root->parent->child->name:jim")
+			deleteResult, _, _ := Execute(result.(*Node), "one:root->parent->child->name:jim")
 			child, ok := deleteResult.(*Node)
 			if ok {
 				if child.GetValueString("name") != "jim" ||
@@ -168,9 +168,9 @@ func TestDelete(t *testing.T) {
 		}
 
 		query = "delete:root->parent->child->name:jim !! block"
-		result, found = Execute(node, query)
+		result, found, _ = Execute(node, query)
 		if found {
-			deleteResult, _ := Execute(result.(*Node), "select:root->parent->child->name:jim")
+			deleteResult, _, _ := Execute(result.(*Node), "select:root->parent->child->name:jim")
 			children, _ := deleteResult.([]*Node)
 			if len(children) > 0 {
 				t.Fatalf("delete test fail : %s", query)
@@ -186,9 +186,9 @@ func TestInsert(t *testing.T) {
 
 	if node != nil {
 		query := "insert:root->parent->child !! name=bill, sex=male, age=31"
-		result, _ := Execute(node, query)
+		result, _, _ := Execute(node, query)
 
-		insertResult, _ := Execute(result.(*Node), "one:root->parent->child->name:bill")
+		insertResult, _, _ := Execute(result.(*Node), "one:root->parent->child->name:bill")
 		child, ok := insertResult.(*Node)
 		if ok {
 			if child.GetValueString("name") != "bill" ||

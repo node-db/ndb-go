@@ -286,7 +286,7 @@ func TestRedirect(t *testing.T) {
 func TestScript(t *testing.T) {
 	node := LoadTestData()
 	if node != nil {
-		query := "script:d:/example.script"
+		query := "script:example.script"
 		result, _, _ := Execute(node, query)
 		tempNode, ok := result.(*Node)
 		

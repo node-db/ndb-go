@@ -1,0 +1,3 @@
+delete:root->parent->child->name:jim !! [sex, age]
+update:root->parent->child->name:lily !! age=21, address=China
+insert:root->parent->child !! name=bill, sex=male, age=31

@@ -22,7 +22,7 @@ func TestWriteFile(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Write node fail")
 	}
-	node, err = ReadFile(filename)
+	node, err = Read(filename)
 	if err != nil {
 		t.Fatalf("Read node fail")
 	}

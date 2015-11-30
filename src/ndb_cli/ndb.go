@@ -27,7 +27,7 @@ func main() {
 	}()
 	
 	if *filename != "" {
-		node, err := ndb.ReadFile(*filename)
+		node, err := ndb.Read(*filename)
 		if err == nil {
 			if *query != "" {
 				result, found, err := ndb.Execute(node, *query)

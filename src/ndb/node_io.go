@@ -1,6 +1,7 @@
 package ndb
 
 import (
+	"fmt"
 	"bufio"
 	"errors"
 	"io"
@@ -20,7 +21,7 @@ func GetCurrPath() string {
 	return currPath
 }
 
-func ReadFile(filename string) (*Node, error) {
+func ReadAsList(filename string) ([]string, error) {
 	if filename == "" {
 		return nil, errors.New("Filename is NULL")
 	}
@@ -48,6 +49,11 @@ func ReadFile(filename string) (*Node, error) {
 		}
 	}
 	
+	return content, nil
+}
+
+func Read(filename string) (*Node, error) {
+	content, err := ReadAsList(filename)
 	if err == nil {
 		node, _ := ParseStringToNode(0, content, nil)
 		return node, nil
@@ -138,4 +144,27 @@ func ParseNodeToString(node *Node) string {
 	}
 	
 	return nodeStr
+}
+
+func Redirect(target string, node interface{}) {
+	outputData := new(Node)
+	switch node.(type) {
+		case []*Node:
+			nodeList := node.([]*Node)
+			for _, nodeItem := range nodeList {
+				nodeItem.SetName("result")
+				outputData.AddChild(nodeItem)
+			}
+			break
+		case *Node:
+			outputData = node.(*Node)
+			break
+	}
+	
+	if strings.ToLower(target) == "print" {
+		nodeStr := ParseNodeToString(outputData)
+		fmt.Println(nodeStr)
+	} else {
+		WriteFile(target, outputData)
+	}
 }

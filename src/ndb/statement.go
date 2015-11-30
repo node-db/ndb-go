@@ -1,21 +1,25 @@
 package ndb
 
 import (
-	"strings"
 	"errors"
+	"strings"
 )
 
 func Execute(node *Node, query string) (interface{}, bool, error) {
-	
+
 	if node == nil {
 		return nil, false, errors.New("Node is NULL")
 	}
-	
+
+	var result interface{} = nil
+	var found bool = false
+	var err error = nil
+
 	command := query
 
 	if strings.Contains(query, ":") {
 		command = strings.TrimSpace(query[0:strings.Index(query, ":")])
-		query = strings.TrimSpace(query[strings.Index(query, ":") + 1 : len(query)])
+		query = strings.TrimSpace(query[strings.Index(query, ":")+1 : len(query)])
 	}
 
 	queryItems := strings.Split(query, "!!")
@@ -28,39 +32,57 @@ func Execute(node *Node, query string) (interface{}, bool, error) {
 			value = strings.TrimSpace(queryItems[1])
 		}
 
+		redirect := ""
+		if strings.Contains(path, ">>") {
+			pathItems := strings.Split(path, ">>")
+			if len(pathItems) == 2 {
+				path = strings.TrimSpace(pathItems[0])
+				redirect = strings.TrimSpace(pathItems[1])
+			}
+		} else if strings.Contains(value, ">>") {
+			valueItems := strings.Split(value, ">>")
+			if len(valueItems) == 2 {
+				value = strings.TrimSpace(valueItems[0])
+				redirect = strings.TrimSpace(valueItems[1])
+			}
+		}
+
 		if command != "" {
 			command = strings.ToLower(command)
 			if command == "select" || command == "one" || command == "exist" {
-				result, found, err := Select(node, path)
+				selectResult, selectFound, selectErr := Select(node, path)
 
-				if command == "one" {
+				found = selectFound
+				err = selectErr
+
+				if command == "select" {
+					result = selectResult
+				} else if command == "one" {
 					if found {
-						return result[0], true, err
-					} else {
-						return nil, false, err
+						result = selectResult[0]
 					}
 				} else if command == "exist" {
-					if found {
-						return nil, true, err
-					} else {
-						return nil, false, err
-					}
+					result = nil
 				}
-
-				return result, found, err
 			} else if command == "update" {
-				return Update(node, path, value)
+				result, found, err = Update(node, path, value)
 			} else if command == "delete" {
-				return Delete(node, path, value)
+				result, found, err = Delete(node, path, value)
 			} else if command == "insert" {
-				return Insert(node, path, value)
+				result, found, err = Insert(node, path, value)
+			} else if command == "script" {
+
 			} else {
-				return nil, false, errors.New("unknow operate : " + command)
+				err = errors.New("unknow operate : " + command)
 			}
 		}
+
+		if redirect != "" {
+			Redirect(redirect, result)
+		}
 	} else {
-		return nil, false, errors.New("unknow query : " + query)
+		err = errors.New("unknow query : " + query)
 	}
 
-	return nil, false, nil
+	return result, found, err
 }

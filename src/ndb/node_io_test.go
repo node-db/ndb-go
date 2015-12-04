@@ -18,7 +18,7 @@ func TestWriteFile(t *testing.T) {
 	filename := "/var/test/example-1.ndb"
 	
 	node := LoadTestData()
-	err := WriteFile(filename, node)
+	err := WriteFile(filename, node, "\t")
 	if err != nil {
 		t.Fatalf("Write node fail")
 	}
@@ -50,7 +50,7 @@ func TestWriteFile(t *testing.T) {
 func TestParseNodeToString(t *testing.T) {
 	node := LoadTestData()
 	if node != nil {
-		nodeStr := ParseNodeToString(node)
+		nodeStr := ParseNodeToString(0, node, "\t")
 		fmt.Println(nodeStr)
 	} else {
 		t.Fatalf("Node is nil")

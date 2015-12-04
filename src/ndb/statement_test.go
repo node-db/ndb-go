@@ -1,16 +1,16 @@
 package ndb
 
 import (
-	"testing"
-	"os"
 	"fmt"
+	"os"
 	"strconv"
+	"testing"
 )
 
 func LoadTestData() *Node {
-	
+
 	dataSource := "local"
-	
+
 	if dataSource == "local" {
 
 		NewChild := func(node string, name string, age string, sex string) *Node {
@@ -232,8 +232,6 @@ func TestInsert(t *testing.T) {
 	}
 }
 
-
-/*
 func TestRedirect(t *testing.T) {
 
 	node := LoadTestData()
@@ -281,7 +279,6 @@ func TestRedirect(t *testing.T) {
 		}
 	}
 }
-*/
 
 func TestScript(t *testing.T) {
 	node := LoadTestData()
@@ -289,7 +286,7 @@ func TestScript(t *testing.T) {
 		query := "script:example.script"
 		result, _, _ := Execute(node, query)
 		tempNode, ok := result.(*Node)
-		
+
 		if ok {
 			selectResult, found, err := Execute(tempNode, "select:root->parent->child->name:bill")
 			if found && err == nil {
@@ -299,7 +296,7 @@ func TestScript(t *testing.T) {
 				ValueAssert(children[0], "sex", "male", query)
 				ValueAssert(children[0], "age", "31", query)
 			}
-			
+
 			selectResult, found, err = Execute(tempNode, "select:root->parent->child->name:lily")
 			if found && err == nil {
 				children := selectResult.([]*Node)
@@ -308,7 +305,7 @@ func TestScript(t *testing.T) {
 				ValueAssert(children[0], "sex", "China", query)
 				ValueAssert(children[0], "age", "21", query)
 			}
-			
+
 			selectResult, found, err = Execute(tempNode, "select:root->parent->child->name:jim")
 			if found && err == nil {
 				children := selectResult.([]*Node)
@@ -318,5 +315,13 @@ func TestScript(t *testing.T) {
 				NullAssert(children[0], "age", query)
 			}
 		}
+	}
+}
+
+func TestPrint(t *testing.T) {
+	node := LoadTestData()
+	if node != nil {
+		nodeStr := Print(node, "\t")
+		fmt.Println(nodeStr)
 	}
 }

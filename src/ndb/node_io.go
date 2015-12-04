@@ -101,7 +101,7 @@ func ParseStringToNode(linenum int, contents []string, parent *Node) (*Node, int
 	return parent, len(contents)
 }
 
-func WriteFile(filename string, node *Node) error {
+func WriteFile(filename string, node *Node, indentFlag string) error {
 	if filename == "" {
 		return errors.New("Filename is NULL")
 	}
@@ -112,35 +112,43 @@ func WriteFile(filename string, node *Node) error {
 	}
 	defer fout.Close()
 	
-	nodeStr := ParseNodeToString(node)
+	nodeStr := Print(node, indentFlag)
 	fout.WriteString(nodeStr)
 	
 	return nil
 }
 
-func ParseNodeToString(node *Node) string {
+func Print(node *Node, indentFlag string) string {
+	return ParseNodeToString(0, node, indentFlag)
+}
+
+func ParseNodeToString(indent int, node *Node, indentFlag string) string {
+	nodeStr := ""
+	
 	name := node.GetName()
 	values := node.GetValues()
 	children := node.GetChileren()
 	
-	nodeStr := ""
+	nextIndent := indent + 1
+	
 	if name != "" {
-		nodeStr = name + "{\n"
+		nodeStr = strings.Repeat(indentFlag, indent) + name + "{\n"
+	} else {
+		nextIndent = indent
 	}
 	
 	for key, value := range values {
 		for _, valueItem := range value {
-			nodeStr = nodeStr + key + ":" + valueItem + "\n"
+			nodeStr = nodeStr + strings.Repeat(indentFlag, nextIndent) + key + ":" + valueItem + "\n"
 		}
-		
 	}
 	
 	for _, child := range children {
-		nodeStr = nodeStr + ParseNodeToString(child)
+		nodeStr = nodeStr + ParseNodeToString(nextIndent, child, indentFlag)
 	}
 	
 	if name != "" {
-		nodeStr = nodeStr + "}\n"
+		nodeStr = nodeStr + strings.Repeat(indentFlag, indent) + "}\n"
 	}
 	
 	return nodeStr
@@ -162,9 +170,9 @@ func Redirect(target string, node interface{}) {
 	}
 	
 	if strings.ToLower(target) == "print" {
-		nodeStr := ParseNodeToString(outputData)
+		nodeStr := Print(outputData, "\t")
 		fmt.Println(nodeStr)
 	} else {
-		WriteFile(target, outputData)
+		WriteFile(target, outputData, "\t")
 	}
 }

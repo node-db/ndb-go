@@ -4,6 +4,7 @@ import (
 	"ndb"
 	"flag"
 	"fmt"
+	"os"
 )
 
 func main() {
@@ -23,6 +24,7 @@ func main() {
 	defer func() {
 		if err := recover(); err != nil {  
 			fmt.Println("Program Error")
+			os.Exit(0)
 		}
 	}()
 	
@@ -32,7 +34,8 @@ func main() {
 			if *query != "" {
 				result, found, err := ndb.Execute(node, *query)
 				if err != nil {
-					fmt.Println("Query Error: " + *query)
+					fmt.Println(err.Error())
+					os.Exit(0)
 				}
 				if found {
 					switch result.(type) { 

@@ -325,3 +325,13 @@ func TestPrint(t *testing.T) {
 		fmt.Println(nodeStr)
 	}
 }
+
+func TestFatalf(t *testing.T) {
+	node := LoadTestData()
+	_, _, err := Execute(node, "root->parent->child->name:jim")
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		t.Fatalf("Fatal test fail")
+	}
+}

@@ -8,7 +8,7 @@ import (
 func Execute(node *Node, query string) (interface{}, bool, error) {
 
 	if node == nil {
-		return nil, false, errors.New("Node is NULL")
+		return nil, false, errors.New("Node data is NULL")
 	}
 
 	var result interface{} = nil
@@ -72,8 +72,10 @@ func Execute(node *Node, query string) (interface{}, bool, error) {
 				result, found, err = Insert(node, path, value)
 			} else if command == "script" {
 
+			} else if command == "" {
+				err = errors.New("Not Any Operate")
 			} else {
-				err = errors.New("unknow operate : " + command)
+				err = errors.New("Unknow Operate : " + command)
 			}
 		}
 
@@ -81,7 +83,7 @@ func Execute(node *Node, query string) (interface{}, bool, error) {
 			Redirect(redirect, result)
 		}
 	} else {
-		err = errors.New("unknow query : " + query)
+		err = errors.New("Unknow Query : " + query)
 	}
 
 	return result, found, err

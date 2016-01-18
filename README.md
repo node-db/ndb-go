@@ -144,32 +144,31 @@ item : value用于检索对应的node，根据后面的值对节点中的数据�
 	package main
 	
 	import (
-		"ndb"
-		"ndb/common"
+		"github.com/node-db/ndb-go/ndb"
 		"fmt"
 	)
 	
 	func main() {
-		node, err := ndb.Read("example.ndb")
-		if err == nil {
-			query := "select:root->parent->child->name:/.*m/"
-			result, found := ndb.Execute(node, query)
-			if found {
-				children, ok := result.([]*common.Node)
-				if ok {
-					for _, child := range children {
-						fmt.Println(child.GetValues())
-					}
+		node, _ := ndb.Read("d:/example.ndb")
+		result, found, err := ndb.Execute(node, "select:root->parent->child")
+		if found && err == nil {
+			children, ok := result.([]*ndb.Node)
+			if ok {
+				for _, child := range children {
+					fmt.Println(child.GetName() + ":" + child.GetValue("name")[0])
 				}
 			}
 		}
+		
+		query := "select:root->parent->:/child|nephew/->sex:female >> print"
+		ndb.Execute(node, query)
 	}
-	
+		
 ## 命令行中使用ndb ##
 
 查询ndb中节点信息
 
-	ndb_cli -f example.ndb -q select:root->parent->child->name:/.*m/
+	ndb_cli -f example.ndb -q "select:root->parent->child->name:/.*m/"
 	
 输出help信息
 	
